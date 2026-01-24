@@ -20,7 +20,7 @@ connectDB();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://book-store-one-alpha.vercel.app"
+    "https://book-store-git-main-abhishekbhatia01s-projects.vercel.app/"
   ],
   credentials: true
 }));
