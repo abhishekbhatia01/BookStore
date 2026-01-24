@@ -50,9 +50,8 @@ const cancelOrder = async (req, res) => {
     }
     order.status = "cancelled";
 
-    order.isArchived  = true;    
+    order.isArchived = true;
     order.archivedAt = new Date();
-    
 
     await order.save();
     res.status(200).json({ message: "Order cancelled", order });
@@ -60,4 +59,73 @@ const cancelOrder = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-module.exports = { fetchOrdersBySeller, fetchOrderbyorderId, cancelOrder };
+
+const fetchAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("userId", "name email")
+      .populate("Items.BookId", "title price thumbnail")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      totalOrders: orders.length,
+      orders,
+    });
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching orders",
+      error: err.message,
+    });
+  }
+};
+
+const fetchOrdersByUserId = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const orders = await Order.find({ userId })
+      .populate("userId", "name email")
+      .populate("Items.BookId", "title price thumbnail")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      totalOrders: orders.length,
+      orders,
+    });
+  } catch (err) {
+    console.error("Error fetching user orders:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching user orders",
+      error: err.message,
+    });
+  }
+};
+
+const orderDelivered = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order.status = "delivered";
+    await order.save();
+    res.status(200).json({ message: "Order marked as delivered", order });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  fetchOrdersBySeller,
+  fetchOrderbyorderId,
+  cancelOrder,
+  fetchAllOrders,
+  fetchOrdersByUserId,
+  orderDelivered,
+};
