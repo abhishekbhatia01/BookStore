@@ -9,7 +9,7 @@ const adminRoutes = require("./routes/admin.routes");
 const cartRoutes = require("./routes/cart.routes");
 const addressRoutes = require("./routes/address.routes");
 const ordersRoutes = require("./routes/order.route");
-const booksRoutes = require("./routes/Books.routes");
+const booksRoutes = require("./routes/books.routes");
 
 const path = require("path");
 const cors = require("cors");
