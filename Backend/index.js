@@ -19,20 +19,20 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://book-store-one-alpha.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 app.use(
   "/images/books",
-  express.static(path.join(__dirname, "public/images/books"))
+  express.static(path.join(__dirname, "public/images/books")),
 );
 app.use(
   "/images/sellerAadhar",
-  express.static(path.join(__dirname, "public/images/sellerAadhar"))
+  express.static(path.join(__dirname, "public/images/sellerAadhar")),
 );
 
 app.use(express.json());
