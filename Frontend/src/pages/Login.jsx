@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Added: Import useNavigate
 import axios from "axios";
+import axiosInstance from "../api/axiosInstance";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,16 +17,10 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axiosInstance.post("/auth/login", {
+        email,
+        password,
+      });
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
