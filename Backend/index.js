@@ -14,17 +14,17 @@ const booksRoutes = require("./routes/books.routes");
 const path = require("path");
 const cors = require("cors");
 
-dotenv.config();
+dotenv.config();  
 connectDB();
 
-app.use(
-  cors({
-    origin: "https://book-store-one-alpha.vercel.app",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://book-store-one-alpha.vercel.app"
+  ],
+  credentials: true
+}));
+
 
 app.use(
   "/images/books",
