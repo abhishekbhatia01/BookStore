@@ -16,7 +16,9 @@ function Order({ user }) {
       try {
         const endpoint =
           user === "Seller"
-            ? "/orders/fetchOrdersBySeller"
+            ? "/orders/fetchOrdersBySeller":
+            user === "Admin"
+            ? "/orders/fetchAllOrders"
             : "/orders/fetchOrderbyUserId";
 
         const response = await axiosInstance.get(endpoint);

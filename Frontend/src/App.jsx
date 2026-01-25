@@ -19,6 +19,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Address from "./pages/Address";
 import OrderDetail from "./pages/OrderDetail";
+import About from "./pages/About";
+
 function App() {
   return (
     <Router>
@@ -41,7 +43,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/Address" element={<Address />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
-
+          <Route path="/about" element={<About />} />
           {/* Update this line */}
         </Routes>
       </div>

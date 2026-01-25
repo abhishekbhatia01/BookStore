@@ -19,12 +19,15 @@ import { Cards, MessageCard } from "../components/Cards";
 import Example from "../components/Example";
 import ListCard from "../components/ListCard";
 import BookList from "../components/BookList";
+import Order from "../components/Order";
 import axios from "axios";
 import axiosInstance from "../api/axiosInstance";
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [active, setActive] = useState("Dashboard");
+  const [active, setActive] = useState(
+    localStorage.getItem("dashboardActive") || "Dashboard"  
+  );
   const [usersCount, setUsersCount] = useState(0);
   const [sellersCount, setSellersCount] = useState(0);
   const [bookCount, setBookCount] = useState(0);
@@ -32,8 +35,13 @@ function Dashboard() {
   const [totalSales, setTotalSales] = useState(0);
   const navigate = useNavigate();
 
+
+
+
+
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("dashboardActive");
     navigate("/login");
   };
   const fetchTotalSales = async () => {
@@ -45,7 +53,7 @@ function Dashboard() {
       console.error("Error fetching total sales:", error);
     }
   }
-  fetchTotalSales();
+  
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -149,7 +157,14 @@ function Dashboard() {
       navigate("/login");
     }
   }, [navigate]);
+  
+  useEffect(() => {
+    fetchTotalSales();
+  }, []);
 
+    useEffect(() => {
+    localStorage.setItem("dashboardActive", active);
+  }, [active]);
   const storeData = [
     {
       title: "Total Users",
@@ -315,6 +330,12 @@ function Dashboard() {
         {active === "Registration" && (
           <>
             <ListCard type={"Registration"} />
+          </>
+        )}
+
+        {active === "Orders" && (
+          <>
+            <Order user={"Admin"} />
           </>
         )}
       </main>

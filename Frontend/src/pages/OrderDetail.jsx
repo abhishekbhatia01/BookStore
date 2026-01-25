@@ -34,7 +34,13 @@ export default function OrderDetail() {
   const handleUpdateStatus = async (status) => {
     setActionLoading(true);
     try {
-      await axiosInstance.post(`/orders/cancelOrder/${id}`, { status });
+      if (status === "cancelled") {
+        await axiosInstance.put(`/orders/cancelOrder/${id}`, { status });
+      } else if (status === "delivered") {
+        await axiosInstance.put(`/orders/orderDelivered/${id}`, { status });
+      } else if (status === "confirmed") {
+        await axiosInstance.put(`/orders/cancelOrder/${id}`, { status });
+      }
       await fetchOrder();
     } catch (err) {
       console.error("Update status error:", err);
@@ -57,14 +63,18 @@ export default function OrderDetail() {
       return s + price * (it.quantity ?? 1);
     }, 0);
 
-  const resolvedStatus = (order.status || order.paymentStatus || "").toString().toLowerCase();
+  const resolvedStatus = (order.status || order.paymentStatus || "")
+    .toString()
+    .toLowerCase();
   let badgeClass = "bg-yellow-100 text-yellow-800";
   if (resolvedStatus === "confirmed" || resolvedStatus === "completed") {
     badgeClass = "bg-green-100 text-green-800";
   } else if (resolvedStatus === "cancelled" || resolvedStatus === "failed") {
     badgeClass = "bg-red-100 text-red-800";
   }
-  const badgeText = (order.status || order.paymentStatus || "").toString().toUpperCase();
+  const badgeText = (order.status || order.paymentStatus || "")
+    .toString()
+    .toUpperCase();
 
   return (
     <div className="max-w-4xl mx-auto mt-20 p-6 space-y-6 text-base">
@@ -83,15 +93,21 @@ export default function OrderDetail() {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-xl font-semibold text-gray-800">Order Details</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Order Details
+            </h3>
             <p className="text-base text-gray-500 mt-1">
-              {order.orderDate ? new Date(order.orderDate).toLocaleString() : ""}
+              {order.orderDate
+                ? new Date(order.orderDate).toLocaleString()
+                : ""}
             </p>
           </div>
 
           <div className="text-right">
             <div className="text-lg font-semibold">{formatCurrency(total)}</div>
-            <div className={`inline-block mt-2 px-3 py-1 text-sm font-medium rounded-full ${badgeClass}`}>
+            <div
+              className={`inline-block mt-2 px-3 py-1 text-sm font-medium rounded-full ${badgeClass}`}
+            >
               {badgeText || "UNKNOWN"}
             </div>
           </div>
@@ -99,7 +115,9 @@ export default function OrderDetail() {
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="text-base font-medium text-gray-700">Shipping Address</h4>
+            <h4 className="text-base font-medium text-gray-700">
+              Shipping Address
+            </h4>
             <div className="text-base text-gray-800 mt-2">
               <div>{order.shippingAddress?.fullName}</div>
               <div>{order.shippingAddress?.street}</div>
@@ -110,7 +128,8 @@ export default function OrderDetail() {
               <div>{order.shippingAddress?.country}</div>
               <div className="text-sm text-gray-500 mt-1">
                 {order.shippingAddress?.phone}{" "}
-                {order.shippingAddress?.email && `• ${order.shippingAddress.email}`}
+                {order.shippingAddress?.email &&
+                  `• ${order.shippingAddress.email}`}
               </div>
             </div>
           </div>
@@ -123,12 +142,16 @@ export default function OrderDetail() {
                 {order.paymentMethod === "cash_on_delivery"
                   ? "Cash On Delivery"
                   : order.paymentMethod === "razorpay"
-                  ? "Pre Paid"
-                  : order.paymentMethod}
+                    ? "Pre Paid"
+                    : order.paymentMethod}
               </div>
               <div>
-                <span className="text-black font-semibold">Payment Status:</span>{" "}
-                {order.paymentStatus === "pending" ? "Pending" : order.paymentStatus || order.status}
+                <span className="text-black font-semibold">
+                  Payment Status:
+                </span>{" "}
+                {order.paymentStatus === "pending"
+                  ? "Pending"
+                  : order.paymentStatus || order.status}
               </div>
               {order.paymentDetails && (
                 <pre className="text-sm text-gray-500 mt-3 p-3 bg-gray-50 rounded">
@@ -150,10 +173,16 @@ export default function OrderDetail() {
               return (
                 <li key={idx} className="flex justify-between items-center">
                   <div>
-                    <div className="text-base font-medium text-gray-800">{title}</div>
-                    <div className="text-sm text-gray-500">Qty: {qty} • {formatCurrency(price)}</div>
+                    <div className="text-base font-medium text-gray-800">
+                      {title}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Qty: {qty} • {formatCurrency(price)}
+                    </div>
                   </div>
-                  <div className="text-base font-semibold">{formatCurrency(price * qty)}</div>
+                  <div className="text-base font-semibold">
+                    {formatCurrency(price * qty)}
+                  </div>
                 </li>
               );
             })}
@@ -169,21 +198,31 @@ export default function OrderDetail() {
           </div>
 
           <div className="flex items-center space-x-2">
-            {order.status !== "cancelled" && (
+            {order.status !== "cancelled" && order.status !== "delivered" && (
               <>
-                <button
-                  onClick={() => handleUpdateStatus("confirmed")}
-                  disabled={actionLoading}
-                  className="px-4 py-2 rounded-md bg-green-600 text-white text-base hover:bg-green-700 disabled:opacity-60"
-                >
-                  {actionLoading ? "..." : "Accept"}
-                </button>
+                {order.status !== "confirmed" ? (
+                  <button
+                    onClick={() => handleUpdateStatus("confirmed")}
+                    disabled={actionLoading}
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white text-base hover:bg-blue-700 disabled:opacity-60"
+                  >
+                    {actionLoading ? "..." : "Confirm Order"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleUpdateStatus("delivered")}
+                    disabled={actionLoading}
+                    className="px-4 py-2 rounded-md bg-green-600 text-white text-base hover:bg-green-700 disabled:opacity-60"
+                  >
+                    {actionLoading ? "..." : "Mark as Delivered"}
+                  </button>
+                )}
                 <button
                   onClick={() => handleUpdateStatus("cancelled")}
                   disabled={actionLoading}
                   className="px-4 py-2 rounded-md bg-red-600 text-white text-base hover:bg-red-700 disabled:opacity-60"
                 >
-                  {actionLoading ? "..." : "Decline"}
+                  {actionLoading ? "..." : "Cancel Order"}
                 </button>
               </>
             )}
