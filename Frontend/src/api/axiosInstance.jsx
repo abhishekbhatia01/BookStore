@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://bookstore1-nxyc.onrender.com/api",
+  baseURL: "http://localhost:5000/api/api",
 });
 
 axiosInstance.interceptors.request.use(
